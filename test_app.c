@@ -3,9 +3,10 @@
 
 int
 main(int argc, char **argv){
-    TcpServerController *tc;
+    TcpServerController *tsc;
 
-    tc = TSC_create(NULL, 0, 0);
+    tsc = TSC_create("Default TCP Server", "127.0.0.1", 40000);
+    TSC_start(tsc);
 
     printf("initialized the TCP Server Controller\n");
 

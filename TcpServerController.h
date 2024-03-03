@@ -19,7 +19,7 @@ typedef struct TcpServerController {
 } TcpServerController;
 
 TcpServerController*
-TSC_create(char *name, uint32_t ip_addr, uint16_t port_no);
+TSC_create(char *name, char *ip_addr, uint16_t port_no);
 void TSC_start(TcpServerController* tsc);
 void TSC_stop(TcpServerController* tsc);
 void TSC_destroy(TcpServerController *ts);
