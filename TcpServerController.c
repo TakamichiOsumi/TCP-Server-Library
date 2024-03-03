@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <string.h>
 #include "TcpServerController.h"
+#include "TcpNewConnectionAcceptor.h"
+#include "TcpClientServiceManager.h"
 
 /* Bundle private variables for TcpServerController */
 typedef struct TcpServerSystemComponent {
@@ -35,6 +37,16 @@ TSC_create(char *name, char *ip_addr, uint16_t port_no){
 
 void
 TSC_start(TcpServerController* tsc){
+    struct in_addr ip;
+
+    /* Start the CRS thread, the DRS thread and initialize the DBMS */
+    CAS_start_acceptor_thread(sys_components.acceptor);
+    DRS_start_manager_thread(sys_components.service_manager);
+    DBM_init_client_db_manager(sys_components.db_manager);
+
+    ip.s_addr = tsc->ip_addr;
+    printf("TCP server is up and running [%s:%d]\n",
+	   inet_ntoa(ip), tsc->port_no);
 }
 
 void

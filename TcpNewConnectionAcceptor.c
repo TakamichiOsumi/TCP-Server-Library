@@ -18,5 +18,9 @@ CAS_create(TcpServerController *tsc){
 }
 
 void
+CAS_start_acceptor_thread(TcpNewConnectionAcceptor *cas){
+}
+
+void
 CAS_destroy(TcpNewConnectionAcceptor *cas){
 }

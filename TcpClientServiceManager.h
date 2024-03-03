@@ -9,6 +9,7 @@ typedef struct TcpClientServiceManager {
 } TcpClientServiceManager;
 
 TcpClientServiceManager *DRS_create(TcpServerController *tsc);
+void DRS_start_manager_thread(TcpClientServiceManager *drs);
 void DRS_destroy(TcpClientServiceManager *drs);
 
 #endif
