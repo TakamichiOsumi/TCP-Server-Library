@@ -3,6 +3,7 @@
 
 #include "TcpServerController.h"
 
+/* Client Data Request Service, DRS */
 typedef struct TcpClientServiceManager {
     TcpServerController *tsc;
 } TcpClientServiceManager;

@@ -4,7 +4,15 @@
 
 TcpNewConnectionAcceptor *
 CAS_create(TcpServerController *tsc){
-    return NULL;
+    TcpNewConnectionAcceptor *acceptor;
+
+    if ((acceptor = (TcpNewConnectionAcceptor *)
+	 malloc(sizeof(TcpNewConnectionAcceptor))) == NULL){
+	perror("malloc");
+	exit(-1);
+    }
+
+    return acceptor;
 }
 
 void

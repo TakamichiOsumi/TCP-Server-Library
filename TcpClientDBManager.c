@@ -3,8 +3,16 @@
 #include "TcpClientDBManager.h"
 
 TcpClientDBManager *
-DBM_create(void){
-    return NULL;
+DBM_create(TcpServerController *tsc){
+    TcpClientDBManager *db_manager;
+
+    if ((db_manager = (TcpClientDBManager *)
+	 malloc(sizeof(TcpClientDBManager))) == NULL){
+	perror("malloc");
+	exit(-1);
+    }
+
+    return db_manager;
 }
 
 void

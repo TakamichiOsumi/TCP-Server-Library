@@ -26,23 +26,9 @@ TSC_create(char *name, char *ip_addr, uint16_t port_no){
     tsc->port_no = port_no;
 
     /* Also, initialize TcpServerSystemComponent variable */
-    if ((sys_components.acceptor = (TcpNewConnectionAcceptor *)
-	 malloc(sizeof(TcpNewConnectionAcceptor))) == NULL){
-	perror("malloc");
-	exit(-1);
-    }
-
-    if ((sys_components.db_manager = (TcpClientDBManager *)
-	 malloc(sizeof(TcpClientDBManager))) == NULL){
-	perror("malloc");
-	exit(-1);
-    }
-
-    if ((sys_components.service_manager = (TcpClientServiceManager *)
-	 malloc(sizeof(TcpClientServiceManager))) == NULL){
-	perror("malloc");
-	exit(-1);
-    }
+    sys_components.acceptor = CAS_create(tsc);
+    sys_components.db_manager = DBM_create(tsc);
+    sys_components.service_manager = DRS_create(tsc);
 
     return tsc;
 }
@@ -56,5 +42,11 @@ TSC_stop(TcpServerController* tsc){
 }
 
 void
-TSC_destroy(TcpServerController *ts){
+TSC_destroy(TcpServerController *tsc){
+    if (tsc == NULL)
+	return;
+
+    CAS_destroy(sys_components.acceptor);
+    DBM_destroy(sys_components.db_manager);
+    DRS_destroy(sys_components.service_manager);
 }

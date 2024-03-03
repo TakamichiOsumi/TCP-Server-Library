@@ -5,7 +5,15 @@
 
 TcpClientServiceManager *
 DRS_create(TcpServerController *tsc){
-    return NULL;
+    TcpClientServiceManager *service_manager;
+
+    if ((service_manager = (TcpClientServiceManager *)
+	 malloc(sizeof(TcpClientServiceManager))) == NULL){
+	perror("malloc");
+	exit(-1);
+    }
+
+    return service_manager;
 }
 
 void
