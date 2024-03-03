@@ -13,6 +13,8 @@ DRS_create(TcpServerController *tsc){
 	exit(-1);
     }
 
+    service_manager->tsc = tsc;
+
     return service_manager;
 }
 

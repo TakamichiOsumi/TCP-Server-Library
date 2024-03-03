@@ -12,6 +12,8 @@ CAS_create(TcpServerController *tsc){
 	exit(-1);
     }
 
+    acceptor->tsc = tsc;
+
     return acceptor;
 }
 

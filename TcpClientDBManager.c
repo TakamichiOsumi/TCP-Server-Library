@@ -12,6 +12,8 @@ DBM_create(TcpServerController *tsc){
 	exit(-1);
     }
 
+    db_manager->tsc = tsc;
+
     return db_manager;
 }
 
