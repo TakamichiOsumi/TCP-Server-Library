@@ -21,7 +21,7 @@ $(OBJ_SYSTEM_COMPONENTS):
 $(SERVER_APPLICATION): $(OBJ_SYSTEM_COMPONENTS)
 	$(CC) $(CFLAGS) $(LIBS) $(MYLIBS) server_application.c $^ -o $@
 
-$(CLIENT_APPLICATION): $(CLIENT_APPLICATION)
+$(CLIENT_APPLICATION):
 	$(CC) $(CFLAGS) $(LIBS) $(MYLIBS) client_application.c $^ -o $@
 
 .phony: clean

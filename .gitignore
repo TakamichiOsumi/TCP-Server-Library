@@ -2,7 +2,7 @@
 G*
 
 # application
-exec_*
+run_*
 
 # Prerequisites
 *.d
