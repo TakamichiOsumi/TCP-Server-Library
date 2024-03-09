@@ -20,6 +20,11 @@ $(OBJ_SYSTEM_COMPONENTS):
 $(APPLICATION): $(OBJ_SYSTEM_COMPONENTS)
 	$(CC) $(CFLAGS) $(LIBS) $(MYLIBS) test_app.c $^ -o $@
 
+.phony: clean test
+
 clean:
 	for dir in $(SUBDIRS); do cd $$dir; make clean; cd ..; done
 	rm -rf *.o $(APPLICATION)
+
+test:
+	@./$(APPLICATION) &> /dev/null && echo "Success if zero >>> $$?"
