@@ -1,3 +1,4 @@
+#include <arpa/inet.h>
 #include <netinet/in.h>
 #include <pthread.h>
 #include <sys/socket.h>
@@ -55,9 +56,16 @@ CAS_listen_new_tcp_connection(void *arg){
 
     /* Name the socket created in CAS_create */
     memset(&tcp_server_addr, 0, sizeof(tcp_server_addr));
-    tcp_server_addr.sin_family = AF_INET; /* IPv4 */
+    /* IPv4 */
+    tcp_server_addr.sin_family = AF_INET;
+    /* Convert the port_no to network byte order */
     tcp_server_addr.sin_port = htons(cas->tsc->port_no);
-    tcp_server_addr.sin_addr.s_addr = htonl(cas->tsc->ip_addr);
+    /* cas->tsc->ip_addr is already inet_addr()ed */
+    tcp_server_addr.sin_addr.s_addr = cas->tsc->ip_addr;
+
+    printf("debug : %s will bind the socket with %s:%u\n",
+	   __FUNCTION__, inet_ntoa(tcp_server_addr.sin_addr),
+	   cas->tsc->port_no);
 
     if (bind(master_socket,
 	     (struct sockaddr *) &tcp_server_addr,
@@ -77,10 +85,19 @@ CAS_listen_new_tcp_connection(void *arg){
      */
 
     while(1){
+
+	printf("Will call accept()\n");
+
 	comm_socket_fd = accept(master_socket,
 				(struct sockaddr *) &client_addr,
 				&client_addr_len);
-	fprintf(stderr, "debug : new connection accepted\n");
+	if (comm_socket_fd < 0){
+	    fprintf(stderr, "debug : new connection failed\n");
+	    continue;
+	}else
+	    fprintf(stderr, "debug : new connection '%s.%d' accepted\n",
+		    inet_ntoa(client_addr.sin_addr),
+		    client_addr.sin_port);
     }
 
     close(master_socket);
@@ -89,8 +106,7 @@ CAS_listen_new_tcp_connection(void *arg){
 }
 
 /*
- * Invoke accept() to accept new connections in the loop and
- * notify the application for new connections.
+ * Launch a thread to handle a client connection.
  */
 void
 CAS_start_acceptor_thread(TcpNewConnectionAcceptor *cas){

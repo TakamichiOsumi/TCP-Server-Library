@@ -45,7 +45,7 @@ TSC_start(TcpServerController* tsc){
     DBM_init_client_db_manager(sys_components.db_manager);
 
     ip.s_addr = tsc->ip_addr;
-    printf("TCP server is up and running [%s:%d]\n",
+    printf("debug : TCP server is up and running [%s:%d]\n",
 	   inet_ntoa(ip), tsc->port_no);
 }
 
