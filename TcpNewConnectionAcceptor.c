@@ -7,6 +7,7 @@
 #include <string.h>
 #include <unistd.h>
 #include "TcpNewConnectionAcceptor.h"
+#include "TcpClient.h"
 
 /*
  * New connections are accepted using 'accept()' sys call.
@@ -94,10 +95,18 @@ CAS_listen_new_tcp_connection(void *arg){
 	if (comm_socket_fd < 0){
 	    fprintf(stderr, "debug : new connection failed\n");
 	    continue;
-	}else
+	}else{
+	    TcpClient *new_client;
+
 	    fprintf(stderr, "debug : new connection '%s.%d' accepted\n",
 		    inet_ntoa(client_addr.sin_addr),
 		    client_addr.sin_port);
+
+	    new_client = TcpClient_create(comm_socket_fd,
+					  client_addr.sin_addr.s_addr,
+					  client_addr.sin_port,
+					  cas->tsc);
+	}
     }
 
     close(master_socket);

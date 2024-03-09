@@ -6,9 +6,9 @@ MYLIBS	= -llinked_list
 SERVER_APPLICATION	= run_server_application
 CLIENT_APPLICATION	= run_client_application
 SYSTEM_COMPONENTS = TcpClientDBManager.c  TcpClientServiceManager.c \
-			TcpNewConnectionAcceptor.c  TcpServerController.c
+			TcpNewConnectionAcceptor.c  TcpServerController.c TcpClient.c
 OBJ_SYSTEM_COMPONENTS = TcpClientDBManager.o  TcpClientServiceManager.o \
-			TcpNewConnectionAcceptor.o  TcpServerController.o
+			TcpNewConnectionAcceptor.o  TcpServerController.o TcpClient.o
 
 all: linked_list.a $(SERVER_APPLICATION) $(CLIENT_APPLICATION)
 
