@@ -25,9 +25,9 @@ typedef struct TcpServerController {
 
 TcpServerController*
 TSC_create(char *name, char *ip_addr, uint16_t port_no);
+void TSC_start(TcpServerController* tsc);
 void TSC_process_new_client(TcpServerController *tsc,
 			    TcpClient *tcp_client);
-void TSC_start(TcpServerController* tsc);
 void TSC_stop(TcpServerController* tsc);
 void TSC_destroy(TcpServerController *tsc);
 

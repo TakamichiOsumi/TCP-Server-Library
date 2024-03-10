@@ -24,8 +24,17 @@ DBM_create(TcpServerController *tsc){
 }
 
 void
+DBM_add_client_to_DB(TcpClientDBManager *dbm,
+		     TcpClient *tcp_client){
+    ll_insert(dbm->tcp_client_db, (void *) tcp_client);
+    printf("The new connection has been cached.\n");
+}
+
+/*
+void
 DBM_init_client_db_manager(TcpClientDBManager *dbm){
 }
+*/
 
 void
 DBM_destroy(TcpClientDBManager *dbm){
