@@ -107,7 +107,7 @@ CAS_listen_new_tcp_connection(void *arg){
 					  client_addr.sin_port,
 					  cas->tsc);
 
-	    TSC_process_new_client(cas->tsc, new_client);
+	    TSC_process_new_client(new_client);
 	}
     }
 

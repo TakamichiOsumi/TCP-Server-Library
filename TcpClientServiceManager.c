@@ -23,5 +23,9 @@ DRS_start_manager_thread(TcpClientServiceManager *drs){
 }
 
 void
+DRS_listen_comm_fd(TcpClient *tcp_client){
+}
+
+void
 DRS_destroy(TcpClientServiceManager *drs){
 }

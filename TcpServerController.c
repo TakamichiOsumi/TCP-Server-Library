@@ -36,8 +36,19 @@ TSC_create(char *name, char *ip_addr, uint16_t port_no){
 }
 
 void
+TSC_set_server_callbacks(TcpServerController *tsc,
+			 client_connected_cb connected_cb,
+			 client_disconnected_cb disconnected_cb,
+			 client_received_msg_cb received_msg_cb){
+    tsc->connected_cb = connected_cb;
+    tsc->disconnected_cb = disconnected_cb;
+    tsc->received_msg_cb = received_msg_cb;
+}
+
+void
 TSC_start(TcpServerController* tsc){
-    struct in_addr ip;
+    /* debug */
+    /* struct in_addr ip; */
 
     /* Start the CRS thread, the DRS thread and initialize the DBMS */
     CAS_start_acceptor_thread(sys_components.acceptor);
@@ -46,19 +57,16 @@ TSC_start(TcpServerController* tsc){
 
     /*
     ip.s_addr = tsc->ip_addr;
-    printf("debug : TCP server is up and running [%s:%d]\n",
-	   inet_ntoa(ip), tsc->port_no);
+    printf("debug : TCP server is up and running [%s:%d]\n", inet_ntoa(ip), tsc->port_no);
     */
 }
 
 void
-TSC_process_new_client(TcpServerController *tsc,
-		       TcpClient *tcp_client){
-
+TSC_process_new_client(TcpClient *tcp_client){
     DBM_add_client_to_DB(sys_components.db_manager,
 			 tcp_client);
+    //DRS_listen_comm_fd()
 }
-
 
 void
 TSC_stop(TcpServerController* tsc){
