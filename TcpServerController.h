@@ -4,6 +4,10 @@
 
 #include <stdint.h>
 
+/*
+ * Enable cross references between TcpServerController and
+ * TcpNewConnectionAcceptor/TcpClientDBManager/TcpClientServiceManager.
+ */
 struct TcpServerController;
 typedef struct TcpServerController TcpServerController;
 
