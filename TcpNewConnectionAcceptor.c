@@ -108,6 +108,8 @@ CAS_listen_new_tcp_connection(void *arg){
 					  cas->tsc);
 
 	    TSC_process_new_client(new_client);
+
+	    cas->tsc->connected_cb(cas->tsc, new_client);
 	}
     }
 

@@ -19,5 +19,7 @@ typedef struct TcpClient {
 TcpClient *
 TcpClient_create(int comm_fd, uint32_t ip_addr,
 		 uint16_t port_no, TcpServerController *tsc);
+char *TcpClient_get_abcd_ip(TcpClient *tcp_client);
+void TcpClient_print(TcpClient *tcp_client);
 
 #endif
