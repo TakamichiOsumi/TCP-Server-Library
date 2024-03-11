@@ -93,12 +93,14 @@ CAS_listen_new_tcp_connection(void *arg){
 				(struct sockaddr *) &client_addr,
 				&client_addr_len);
 	if (comm_socket_fd < 0){
-	    fprintf(stderr, "debug : new connection failed\n");
+	    fprintf(stderr,
+		    "debug (%s): new connection failed\n", __FUNCTION__);
 	    continue;
 	}else{
 	    TcpClient *new_client;
 
-	    fprintf(stderr, "debug : new connection '%s.%d' accepted\n",
+	    fprintf(stderr, "debug (%s): new connection '%s.%d' accepted\n",
+		    __FUNCTION__,
 		    inet_ntoa(client_addr.sin_addr),
 		    client_addr.sin_port);
 
@@ -107,9 +109,10 @@ CAS_listen_new_tcp_connection(void *arg){
 					  client_addr.sin_port,
 					  cas->tsc);
 
-	    TSC_process_new_client(new_client);
+	    if (cas->tsc->connected_cb)
+		cas->tsc->connected_cb(cas->tsc, new_client);
 
-	    cas->tsc->connected_cb(cas->tsc, new_client);
+	    TSC_process_new_client(new_client);
 	}
     }
 

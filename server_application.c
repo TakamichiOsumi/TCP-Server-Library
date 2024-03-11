@@ -5,17 +5,21 @@
 
 static void
 app_client_connected(TcpServerController *tsc, TcpClient *tcp_client){
-    printf("debug : %s has been called\n", __FUNCTION__);
+    printf("application : %s has been called\n", __FUNCTION__);
     TcpClient_print(tcp_client);
 }
 
 static void
 app_client_disconnected(TcpServerController *tsc, TcpClient *tcp_client){
+    printf("application : %s has been called\n", __FUNCTION__);
+    TcpClient_print(tcp_client);
 }
 
 static void
 app_client_received_msg(TcpServerController *tsc, TcpClient *tcp_client,
 			char *msg, uint16_t msg_size){
+    printf("application : %s has been called\n", __FUNCTION__);
+    TcpClient_print(tcp_client);
 }
 
 int

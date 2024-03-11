@@ -57,7 +57,8 @@ void
 TSC_process_new_client(TcpClient *tcp_client){
     DBM_add_client_to_DB(sys_components.db_manager,
 			 tcp_client);
-    //DRS_listen_comm_fd()
+    DBM_display(sys_components.db_manager);
+    // DRS_listen_comm_fd();
 }
 
 void

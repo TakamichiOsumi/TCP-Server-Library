@@ -1,11 +1,19 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "TcpClientDBManager.h"
+#include "TcpClient.h"
 
 static bool
 search_tcp_client_by_id(void *p, void *key){
     return false;
 }
+
+/*
+ * There is no specific memory allocated dynamically for
+ * each TcpClient object. Do nothing.
+ */
+static void
+free_tcp_client(void *data){}
 
 TcpClientDBManager *
 DBM_create(TcpServerController *tsc){
@@ -18,15 +26,27 @@ DBM_create(TcpServerController *tsc){
     }
 
     db_manager->tsc = tsc;
-    db_manager->tcp_client_db = ll_init(search_tcp_client_by_id);
+    db_manager->tcp_client_db = ll_init(search_tcp_client_by_id,
+					free_tcp_client,
+					TcpClient_print);
 
     return db_manager;
+}
+
+void
+DBM_display(TcpClientDBManager *dbm){
+    printf("The new connection has been cached.\n");
+
+    printf("------ <Current DB> ------\n");
+    ll_print_all(dbm->tcp_client_db);
+    printf("--------------------------\n");
 }
 
 void
 DBM_add_client_to_DB(TcpClientDBManager *dbm,
 		     TcpClient *tcp_client){
     ll_insert(dbm->tcp_client_db, (void *) tcp_client);
+
     printf("The new connection has been cached.\n");
 }
 

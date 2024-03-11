@@ -32,10 +32,12 @@ TcpClient_get_abcd_ip(TcpClient *tcp_client){
     return inet_ntoa(ip);
 }
 
-
+/* Callback function for TcpClientDBManager's tcp_client_db list */
 void
-TcpClient_print(TcpClient *tcp_client){
-    printf("A new client [%s:%d] has connected\n",
+TcpClient_print(void *data){
+    TcpClient *tcp_client = (TcpClient *) data;
+
+    printf("The connection with client [%s:%d] is cached\n",
 	   TcpClient_get_abcd_ip(tcp_client),
 	   tcp_client->port_no);
 }

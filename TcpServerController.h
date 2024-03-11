@@ -34,7 +34,8 @@ typedef struct TcpServerController {
 
 } TcpServerController;
 
-TcpServerController* TSC_create(char *name, char *ip_addr, uint16_t port_no);
+TcpServerController* TSC_create(char *name,
+				char *ip_addr, uint16_t port_no);
 void TSC_set_server_callbacks(TcpServerController *tsc,
 			      client_connected_cb connected_cb,
 			      client_disconnected_cb disconnected_cb,

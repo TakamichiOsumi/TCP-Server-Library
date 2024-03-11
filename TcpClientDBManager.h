@@ -14,7 +14,7 @@ typedef struct TcpClientDBManager {
 
 TcpClientDBManager *DBM_create(TcpServerController *tsc);
 void DBM_add_client_to_DB(TcpClientDBManager *dbm, TcpClient *tcp_client);
-
+void DBM_display(TcpClientDBManager *dbm);
 /* void DBM_init_client_db_manager(TcpClientDBManager *dbm); */
 void DBM_destroy(TcpClientDBManager *dbm);
 
