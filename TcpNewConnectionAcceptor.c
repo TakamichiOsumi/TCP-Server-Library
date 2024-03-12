@@ -87,19 +87,19 @@ CAS_listen_new_tcp_connection(void *arg){
 
     while(1){
 
-	printf("debug : will call accept()\n");
+	printf("debug : will call accept() in %s\n", __FUNCTION__);
 
 	comm_socket_fd = accept(master_socket,
 				(struct sockaddr *) &client_addr,
 				&client_addr_len);
 	if (comm_socket_fd < 0){
 	    fprintf(stderr,
-		    "debug (%s): new connection failed\n", __FUNCTION__);
+		    "debug : [%s] new connection failed\n", __FUNCTION__);
 	    continue;
 	}else{
 	    TcpClient *new_client;
 
-	    fprintf(stderr, "debug (%s): new connection '%s.%d' accepted\n",
+	    fprintf(stderr, "debug : [%s] new connection '%s.%d' accepted\n",
 		    __FUNCTION__,
 		    inet_ntoa(client_addr.sin_addr),
 		    client_addr.sin_port);
@@ -132,7 +132,7 @@ CAS_start_acceptor_thread(TcpNewConnectionAcceptor *cas){
 	exit(-1);
     }
 
-    printf("debug : '%s' has created a thread to accept new connections\n",
+    printf("debug : %s has created a thread to accept new connections\n",
 	   __FUNCTION__);
 }
 

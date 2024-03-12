@@ -37,7 +37,8 @@ void
 TcpClient_print(void *data){
     TcpClient *tcp_client = (TcpClient *) data;
 
-    printf("The connection with client [%s:%d] is cached\n",
+    printf("debug : print the connection with client [%s:%d] in %s\n",
 	   TcpClient_get_abcd_ip(tcp_client),
-	   tcp_client->port_no);
+	   tcp_client->port_no,
+	   __FUNCTION__);
 }

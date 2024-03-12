@@ -55,14 +55,18 @@ TSC_start(TcpServerController* tsc){
 
 void
 TSC_process_new_client(TcpClient *tcp_client){
+    /* TcpClientDBManager */
     DBM_add_client_to_DB(sys_components.db_manager,
 			 tcp_client);
     DBM_display(sys_components.db_manager);
-    // DRS_listen_comm_fd();
+
+    /* TcpClientServiceManager */
+    // DRS_start_listen_comm_fd(sys_components.service_manager, tcp_client);
 }
 
 void
 TSC_stop(TcpServerController* tsc){
+
 }
 
 void

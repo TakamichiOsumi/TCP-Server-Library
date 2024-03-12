@@ -27,18 +27,21 @@ DBM_create(TcpServerController *tsc){
 
     db_manager->tsc = tsc;
     db_manager->tcp_client_db = ll_init(search_tcp_client_by_id,
-					free_tcp_client,
-					TcpClient_print);
+					free_tcp_client);
 
     return db_manager;
 }
 
 void
 DBM_display(TcpClientDBManager *dbm){
-    printf("The new connection has been cached.\n");
+    node *n;
 
     printf("------ <Current DB> ------\n");
-    ll_print_all(dbm->tcp_client_db);
+    ll_begin_iter(dbm->tcp_client_db);
+    while((n = ll_get_iter_node(dbm->tcp_client_db)) != NULL){
+	TcpClient_print((void *) n->data);
+    }
+    ll_end_iter(dbm->tcp_client_db);
     printf("--------------------------\n");
 }
 
@@ -47,7 +50,8 @@ DBM_add_client_to_DB(TcpClientDBManager *dbm,
 		     TcpClient *tcp_client){
     ll_insert(dbm->tcp_client_db, (void *) tcp_client);
 
-    printf("The new connection has been cached.\n");
+    printf("debug : the new connection gets cached in TcpClientDBManager by %s\n",
+	   __FUNCTION__);
 }
 
 /*
