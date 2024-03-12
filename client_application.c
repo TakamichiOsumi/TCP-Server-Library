@@ -24,6 +24,8 @@ main(int argc, char **argv){
 	exit(-1);
     }
 
+    sleep(10);
+
     close(socket_fd);
 
     return 0;

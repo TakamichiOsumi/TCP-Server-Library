@@ -19,6 +19,7 @@ static void
 app_client_received_msg(TcpServerController *tsc, TcpClient *tcp_client,
 			char *msg, uint16_t msg_size){
     printf("application : %s has been called\n", __FUNCTION__);
+    printf("application : the message is '%s'\n", msg);
     TcpClient_print(tcp_client);
 }
 

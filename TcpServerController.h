@@ -42,6 +42,7 @@ void TSC_set_server_callbacks(TcpServerController *tsc,
 			      client_received_msg_cb received_msg_cb);
 void TSC_start(TcpServerController* tsc);
 void TSC_process_new_client(TcpClient *tcp_client);
+void TSC_delete_disconnected_client(TcpClient *tcp_client);
 void TSC_stop(TcpServerController* tsc);
 void TSC_destroy(TcpServerController *tsc);
 

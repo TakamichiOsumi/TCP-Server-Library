@@ -49,7 +49,7 @@ void
 TSC_start(TcpServerController* tsc){
     /* Start the CRS thread, the DRS thread and initialize the DBMS */
     CAS_start_acceptor_thread(sys_components.acceptor);
-    DRS_start_manager_thread(sys_components.service_manager);
+    // DRS_start_manager_thread(sys_components.service_manager);
     // DBM_init_client_db_manager(sys_components.db_manager);
 }
 
@@ -61,7 +61,17 @@ TSC_process_new_client(TcpClient *tcp_client){
     DBM_display(sys_components.db_manager);
 
     /* TcpClientServiceManager */
-    // DRS_start_listen_comm_fd(sys_components.service_manager, tcp_client);
+    DRS_start_listen_comm_fd(sys_components.service_manager,
+			     tcp_client);
+}
+
+/*
+ * Called from DRS when the service thread detects client disconnection.
+ */
+void
+TSC_delete_disconnected_client(TcpClient *tcp_client){
+    DBM_remove_client_from_DB(sys_components.db_manager,
+			      tcp_client);
 }
 
 void

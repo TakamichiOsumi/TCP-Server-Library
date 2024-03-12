@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <memory.h>
 #include <sys/select.h>
 #include <sys/socket.h>
@@ -16,7 +17,12 @@ static linked_list *copied_tcp_client_db;
 
 static bool
 DRS_search_tcp_client_by_key(void *p, void *key){
-    return false;
+    TcpClient *tcp_client = (TcpClient *) p;
+
+    if (tcp_client->comm_fd == (uintptr_t) key)
+	return true;
+    else
+	return false;
 }
 
 /* No dynamically-allocated unique member in TcpClient */
@@ -70,7 +76,7 @@ DRS_create(TcpServerController *tsc){
 }
 
 static void
-DRS_copy_client_fds_to_fdset(fd_set *set){
+DRS_copy_client_fds_to_fd_set(fd_set *set){
     TcpClient *tcp_client;
     node *n;
 
@@ -82,10 +88,14 @@ DRS_copy_client_fds_to_fdset(fd_set *set){
     ll_end_iter(copied_tcp_client_db);
 }
 
+void
+DRS_delete_disconnected_client(TcpClient *tcp_client){
+    assert(ll_remove(copied_tcp_client_db, (void *) tcp_client->comm_fd) != NULL);
+}
+
 static void*
 DRS_process_comm_fds(void *arg){
-    TcpClientServiceManager *drs =
-	(TcpClientServiceManager *) arg;
+    TcpClientServiceManager *drs = (TcpClientServiceManager *) arg;
     struct sockaddr_in client_addr;
     socklen_t addr_len = sizeof(client_addr);
     int recv_bytes;
@@ -98,11 +108,10 @@ DRS_process_comm_fds(void *arg){
 
     drs->max_fd = DRS_get_max_comm_fd();
 
-    FD_ZERO(&drs->backup_fd_set);
-    DRS_copy_client_fds_to_fdset(&drs->backup_fd_set);
-
     while(1){
 
+	FD_ZERO(&drs->backup_fd_set);
+	DRS_copy_client_fds_to_fd_set(&drs->backup_fd_set);
 	memcpy(&drs->active_fd_set, &drs->backup_fd_set, sizeof(fd_set));
 
 	printf("debug : will be blocked on select in %s\n", __FUNCTION__);
@@ -110,12 +119,14 @@ DRS_process_comm_fds(void *arg){
 	select(drs->max_fd + 1, &drs->active_fd_set, 0, 0, 0);
 
 	ll_begin_iter(copied_tcp_client_db);
+
 	while((n = ll_get_iter_node(copied_tcp_client_db)) != NULL){
 	    tcp_client = (TcpClient *) n->data;
 
 	    if (FD_ISSET(tcp_client->comm_fd, &drs->active_fd_set)){
 
-		printf("debug : found %d comm_fd owner\n", tcp_client->comm_fd);
+		printf("debug : found the TcpClient who owns '%lu' comm fd \n",
+		       tcp_client->comm_fd);
 
 		recv_bytes = recvfrom(tcp_client->comm_fd,
 				      tcp_client_message_buffer,
@@ -126,23 +137,37 @@ DRS_process_comm_fds(void *arg){
 		if (recv_bytes < 0){
 		    perror("recvfrom");
 		    exit(-1);
-		}
-
-		if (drs->tsc->received_msg_cb){
-		    drs->tsc->received_msg_cb(drs->tsc,
-					      tcp_client,
-					      tcp_client_message_buffer,
-					      TCP_CLIENT_MSG_BUFFER_SIZE);
+		}else if (recv_bytes == 0){
+		    /*
+		     * Now the client gets disconnected.
+		     *
+		     * Remove the client object from both of 'TcpClientDBManager'
+		     * database and its local copy in 'copied_tcp_client_db'.
+		     *
+		     * Lastly, free the TcpClient object itself.
+		     */
+		    TSC_delete_disconnected_client(tcp_client);
+		    DRS_delete_disconnected_client(tcp_client);
+		    free(tcp_client);
+		    printf("debug : deleted all references to tcp client by %s\n",
+			   __FUNCTION__);
+		}else{
+		    if (drs->tsc->received_msg_cb){
+			drs->tsc->received_msg_cb(drs->tsc,
+						  tcp_client,
+						  tcp_client_message_buffer,
+						  TCP_CLIENT_MSG_BUFFER_SIZE);
+		    }
 		}
 		break;
-	    }
+	    } /* FD_ISSET */
 	}
+
 	ll_end_iter(copied_tcp_client_db);
     }
 
     return NULL;
 }
-
 
 void
 DRS_start_manager_thread(TcpClientServiceManager *drs){
@@ -187,10 +212,10 @@ DRS_start_listen_comm_fd(TcpClientServiceManager *drs,
 			 TcpClient *tcp_client){
 
     DRS_stop_manager_thread(drs);
-    printf("The service manager thread is cancelled\n");
+    printf("debug : the service manager thread is cancelled\n");
 
     ll_insert(copied_tcp_client_db, (void *) tcp_client);
-    printf("The new client was added to the local copy of client DB\n");
+    printf("debug : the new client was added to the local copy of DRS also\n");
 
     if ((drs->service_thread = (pthread_t *) malloc(sizeof(pthread_t))) == NULL){
 	perror("malloc");

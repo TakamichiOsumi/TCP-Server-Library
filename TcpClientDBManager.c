@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include "TcpClientDBManager.h"
@@ -5,7 +6,12 @@
 
 static bool
 search_tcp_client_by_id(void *p, void *key){
-    return false;
+    TcpClient *tcp_client = (TcpClient *) p;
+
+    if (tcp_client->comm_fd == (uintptr_t) key)
+	return true;
+    else
+	return false;
 }
 
 /*
@@ -53,6 +59,18 @@ DBM_add_client_to_DB(TcpClientDBManager *dbm,
     printf("debug : the new connection gets cached in TcpClientDBManager by %s\n",
 	   __FUNCTION__);
 }
+
+void
+DBM_remove_client_from_DB(TcpClientDBManager *dbm, TcpClient *tcp_client){
+    assert(ll_remove(dbm->tcp_client_db, (void *) tcp_client->comm_fd) != NULL);
+}
+
+/*
+void
+DBM_delete_client_from_DB(TcpClientDBManager *dbm,
+			  void *key){
+}
+*/
 
 /*
 void
