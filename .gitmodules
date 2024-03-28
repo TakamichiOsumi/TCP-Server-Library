@@ -1,3 +1,6 @@
 [submodule "Linked-List"]
 	path = Linked-List
 	url = https://github.com/TakamichiOsumi/Linked-List.git
+[submodule "CircularByteBuffer"]
+	path = CircularByteBuffer
+	url = https://github.com/TakamichiOsumi/CircularByteBuffer.git
