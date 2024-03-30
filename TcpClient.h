@@ -8,12 +8,14 @@ struct TcpClient;
 typedef struct TcpClient TcpClient;
 
 #include "TcpServerController.h"
+#include "TcpMessageDemarcation.h"
 
 typedef struct TcpClient {
     uintptr_t comm_fd;
     uint32_t ip_addr;
     uint16_t port_no;
     TcpServerController *tsc;
+    TcpMessageDemarcation *msg_dmrc;
 } TcpClient;
 
 TcpClient *

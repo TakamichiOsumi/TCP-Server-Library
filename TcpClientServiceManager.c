@@ -153,6 +153,12 @@ DRS_process_comm_fds(void *arg){
 			   __FUNCTION__);
 		}else{
 		    /* New message has been received */
+		    if (tcp_client->msg_dmrc != NULL){
+			MD_process_message(tcp_client->msg_dmrc,
+					   tcp_client, tcp_client_message_buffer,
+					   TCP_CLIENT_MSG_BUFFER_SIZE);
+		    }
+
 		    if (drs->tsc->received_msg_cb){
 			drs->tsc->received_msg_cb(drs->tsc,
 						  tcp_client,
