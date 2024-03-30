@@ -125,7 +125,7 @@ DRS_process_comm_fds(void *arg){
 
 	    if (FD_ISSET(tcp_client->comm_fd, &drs->active_fd_set)){
 
-		printf("debug : found the TcpClient who owns '%lu' comm fd \n",
+		printf("debug : found the TcpClient who owns '%lu' comm fd\n",
 		       tcp_client->comm_fd);
 
 		recv_bytes = recvfrom(tcp_client->comm_fd,
@@ -152,6 +152,7 @@ DRS_process_comm_fds(void *arg){
 		    printf("debug : deleted all references to tcp client by %s\n",
 			   __FUNCTION__);
 		}else{
+		    /* New message has been received */
 		    if (drs->tsc->received_msg_cb){
 			drs->tsc->received_msg_cb(drs->tsc,
 						  tcp_client,
