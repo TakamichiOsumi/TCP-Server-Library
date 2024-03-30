@@ -6,8 +6,8 @@
 #include "TcpClient.h"
 
 TcpClient *
-TcpClient_create(int comm_fd, uint32_t ip_addr,
-		 uint16_t port_no, TcpServerController *tsc){
+TcpClient_create(int comm_fd, uint32_t ip_addr, uint16_t port_no,
+		 TcpServerController *tsc, TcpMessageDemarcation *msg_dmrc){
     TcpClient *client;
 
     if ((client = (TcpClient *) malloc(sizeof(TcpClient))) == NULL){
@@ -19,6 +19,7 @@ TcpClient_create(int comm_fd, uint32_t ip_addr,
     client->ip_addr = ip_addr;
     client->port_no = port_no;
     client->tsc = tsc;
+    client->msg_dmrc = msg_dmrc;
 
     return client;
 }

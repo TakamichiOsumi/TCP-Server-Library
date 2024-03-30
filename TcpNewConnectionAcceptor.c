@@ -7,6 +7,7 @@
 #include <string.h>
 #include <unistd.h>
 #include "TcpNewConnectionAcceptor.h"
+#include "TcpMessageDemarcation.h"
 #include "TcpClient.h"
 
 /*
@@ -98,16 +99,24 @@ CAS_listen_new_tcp_connection(void *arg){
 	    continue;
 	}else{
 	    TcpClient *new_client;
+	    TcpMessageDemarcation *msg_dmrc;
+	    char *msg = "Hellooo";
 
 	    fprintf(stderr, "debug : [%s] new connection '%s.%d' accepted\n",
 		    __FUNCTION__,
 		    inet_ntoa(client_addr.sin_addr),
 		    client_addr.sin_port);
 
+	    msg_dmrc = MD_create_demarcation_instance(FIXED_SIZE,
+						      sizeof(msg),
+						      sizeof(msg) + 1);
+
 	    new_client = TcpClient_create(comm_socket_fd,
 					  client_addr.sin_addr.s_addr,
 					  client_addr.sin_port,
-					  cas->tsc);
+					  cas->tsc,
+					  msg_dmrc);
+
 	    fprintf(stderr, "debug : [%s] new conneciton's file descriptor is '%d'\n",
 		    __FUNCTION__, comm_socket_fd);
 

@@ -17,7 +17,7 @@ MD_is_ready_for_flush(TcpMessageDemarcation *msg_dmrc){
 
 TcpMessageDemarcation *
 MD_create_demarcation_instance(TcpMessageDemarcationType dmrc_type,
-			       unsigned int cbb_internal_buffer_size){
+			       size_t msg_size, unsigned int cbb_internal_buffer_size){
     TcpMessageDemarcation *msg_dmrc;
 
     msg_dmrc = (TcpMessageDemarcation *) malloc(sizeof(TcpMessageDemarcation));
@@ -25,6 +25,8 @@ MD_create_demarcation_instance(TcpMessageDemarcationType dmrc_type,
 	perror("malloc");
 	exit(-1);
     }
+
+    msg_dmrc->msg_size = msg_size;
     msg_dmrc->dmrc_type = dmrc_type;
     msg_dmrc->cbb = CBB_init(cbb_internal_buffer_size);
     msg_dmrc->buffer = (char *) malloc(sizeof(char) * (cbb_internal_buffer_size + 1));
@@ -44,16 +46,18 @@ MD_process_message(TcpMessageDemarcation *msg_dmrc, TcpClient *tcp_client,
 
     /* Copy the message to the cbb */
     assert(CBB_write(tcp_client->msg_dmrc->cbb,
-		     msg_recvd, msg_size));
+		     msg_recvd, msg_size) > 0);
+
     if (!MD_is_ready_for_flush(msg_dmrc)){
 	return;
     }
 
-    while((bytes_read = CBB_read(msg_dmrc->cbb,
-				 msg_dmrc->buffer,
-				 msg_dmrc->msg_size, true) > 0)){
-	printf("Read %zu bytes\n", bytes_read);
-    }
+    bytes_read = CBB_read(msg_dmrc->cbb, msg_dmrc->buffer, msg_dmrc->msg_size, true);
+    printf("debug : Read %zu bytes by CBB_read in %s\n", bytes_read, __FUNCTION__);
+
+    tcp_client->tsc->received_msg_cb(tcp_client->tsc, tcp_client,
+				     msg_dmrc->buffer, bytes_read);
+
     // MD_process_process_fixed_size_message();
     // MD_process_process_variable_size_message();
 }

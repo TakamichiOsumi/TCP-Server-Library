@@ -9,6 +9,7 @@ int
 main(int argc, char **argv){
     struct sockaddr_in tcp_dest;
     int socket_fd;
+    char *msg1 = "Hellooo", *msg2 =  "Server!";
 
     socket_fd = socket(AF_INET, SOCK_STREAM, 0);
 
@@ -24,7 +25,15 @@ main(int argc, char **argv){
 	exit(-1);
     }
 
-    sleep(10);
+    sleep(2);
+
+    send(socket_fd, msg1, sizeof(msg1), 0);
+
+    sleep(2);
+
+    send(socket_fd, msg2, sizeof(msg2), 0);
+
+    sleep(2);
 
     close(socket_fd);
 
