@@ -156,7 +156,7 @@ DRS_process_comm_fds(void *arg){
 		    if (tcp_client->msg_dmrc != NULL){
 			MD_process_message(tcp_client->msg_dmrc,
 					   tcp_client, tcp_client_message_buffer,
-					   tcp_client->msg_dmrc->msg_size);
+					   recv_bytes);
 		    }
 		}
 		break;

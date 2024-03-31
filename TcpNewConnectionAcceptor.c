@@ -99,14 +99,12 @@ CAS_listen_new_tcp_connection(void *arg){
 	}else{
 	    TcpClient *new_client;
 	    TcpMessageDemarcation *msg_dmrc;
-	    char *msg = "Hellooo";
 
 	    printf("debug : [%s] new connection '%s.%d' accepted\n",
 		   __FUNCTION__, inet_ntoa(client_addr.sin_addr), client_addr.sin_port);
 
-	    msg_dmrc = MD_create_demarcation_instance(FIXED_SIZE,
-						      sizeof(msg),
-						      sizeof(msg) + 1);
+	    msg_dmrc = MD_create_demarcation_instance(VARIABLE_SIZE,
+						      MessageDemarcationBufferSize);
 
 	    new_client = TcpClient_create(comm_socket_fd,
 					  client_addr.sin_addr.s_addr,
