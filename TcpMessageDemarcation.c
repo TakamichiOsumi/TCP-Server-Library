@@ -9,10 +9,12 @@
 
 static bool
 MD_is_ready_for_flush(TcpMessageDemarcation *msg_dmrc, size_t required_string_length){
-    printf("\t %d / %zu > 0 ? %s\n", msg_dmrc->cbb->used_buffer_size, required_string_length,
-	   msg_dmrc->cbb->used_buffer_size / required_string_length > 0 ? "yes" : "no");
+    bool enough_data = msg_dmrc->cbb->used_buffer_size / required_string_length > 0;
 
-    if ((msg_dmrc->cbb->used_buffer_size / required_string_length) > 0){
+    printf("debug : %d / %zu > 0 ? %s\n", msg_dmrc->cbb->used_buffer_size, required_string_length,
+	   enough_data ? "yes" : "no");
+
+    if (enough_data){
 	return true;
     }else{
 	return false;
