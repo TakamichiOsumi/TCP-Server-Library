@@ -8,14 +8,26 @@
 static void
 send_string_pair(int socket_fd, char *msg_len, char *msg,
 		 int sleep_sec1, int sleep_sec2){
+    int sent_bytes;
 
-    send(socket_fd, msg_len, 2, 0); /* 2 bytes */
+    /* 2 bytes */
+    if ((sent_bytes = send(socket_fd, msg_len, 2, 0)) < 0){
+	perror("send");
+	exit(-1);
+    }
+
+    printf("sent_bytes : %d\n", sent_bytes);
 
     if (sleep_sec1 > 0){
 	sleep(sleep_sec1); /* for debug */
     }
 
-    send(socket_fd, msg, strlen(msg), 0);
+    if ((sent_bytes = send(socket_fd, msg, strlen(msg), 0) < 0)){
+	perror("send");
+	exit(-1);
+    }
+
+    printf("sent_bytes : %d\n", sent_bytes);
 
     if (sleep_sec2 > 0){
 	sleep(sleep_sec2); /* for debug */
@@ -42,7 +54,7 @@ main(int argc, char **argv){
     }
 
     send_string_pair(socket_fd, "05", "Hello", 3, 3);
-    send_string_pair(socket_fd, "08", "Helloooo", 3, 3);
+    send_string_pair(socket_fd, "12", "FooBarFooBar", 3, 3);
     send_string_pair(socket_fd, "08", "Server!!", 3, 3);
     send_string_pair(socket_fd, "21", "from client to server", 3, 3);
 

@@ -2,13 +2,15 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "TcpClient.h"
 #include "CircularByteBuffer/CircularByteBuffer.h"
 #include "TcpMessageDemarcation.h"
 
 static bool
 MD_is_ready_for_flush(TcpMessageDemarcation *msg_dmrc, size_t required_string_length){
-    printf("\t %d / %zu > ?\n", msg_dmrc->cbb->used_buffer_size, required_string_length);
+    printf("\t %d / %zu > 0 ? %s\n", msg_dmrc->cbb->used_buffer_size, required_string_length,
+	   msg_dmrc->cbb->used_buffer_size / required_string_length > 0 ? "yes" : "no");
 
     if ((msg_dmrc->cbb->used_buffer_size / required_string_length) > 0){
 	return true;
@@ -67,6 +69,7 @@ MD_process_message(TcpMessageDemarcation *msg_dmrc, TcpClient *tcp_client,
 	/*
 	 * Step 2: read the client message, following the previous header sent by client.
 	 */
+	CBB_dump_snapshot(msg_dmrc->cbb);
 	assert(msg_dmrc->parsed_msg_length != 0);
 	/*
 	 * Copy characters from recvfrom() internal buffer and increment cbb's internal
@@ -88,9 +91,15 @@ MD_process_message(TcpMessageDemarcation *msg_dmrc, TcpClient *tcp_client,
 
     printf("Read %zu bytes by CBB_read in %s\n", bytes_read, __FUNCTION__);
 
-    if (tcp_client->tsc->received_msg_cb != NULL)
+    if (tcp_client->tsc->received_msg_cb != NULL){
 	tcp_client->tsc->received_msg_cb(tcp_client->tsc, tcp_client,
 					 msg_dmrc->client_message, bytes_read);
+	/*
+	 * Clean up the buffer. Otherwise, some junks are left in this buffer,
+	 * if the next message length is shorter than this iteration.
+	 */
+	memset(msg_dmrc->client_message, '\0', msg_dmrc->cbb->max_buffer_size + 1);
+    }
 }
 
 void
