@@ -94,18 +94,15 @@ CAS_listen_new_tcp_connection(void *arg){
 				(struct sockaddr *) &client_addr,
 				&client_addr_len);
 	if (comm_socket_fd < 0){
-	    fprintf(stderr,
-		    "debug : [%s] new connection failed\n", __FUNCTION__);
-	    continue;
+	    perror("accept");
+	    exit(0);
 	}else{
 	    TcpClient *new_client;
 	    TcpMessageDemarcation *msg_dmrc;
 	    char *msg = "Hellooo";
 
-	    fprintf(stderr, "debug : [%s] new connection '%s.%d' accepted\n",
-		    __FUNCTION__,
-		    inet_ntoa(client_addr.sin_addr),
-		    client_addr.sin_port);
+	    printf("debug : [%s] new connection '%s.%d' accepted\n",
+		   __FUNCTION__, inet_ntoa(client_addr.sin_addr), client_addr.sin_port);
 
 	    msg_dmrc = MD_create_demarcation_instance(FIXED_SIZE,
 						      sizeof(msg),
@@ -117,8 +114,8 @@ CAS_listen_new_tcp_connection(void *arg){
 					  cas->tsc,
 					  msg_dmrc);
 
-	    fprintf(stderr, "debug : [%s] new conneciton's file descriptor is '%d'\n",
-		    __FUNCTION__, comm_socket_fd);
+	    printf("debug : [%s] new conneciton's file descriptor is '%d'\n",
+		   __FUNCTION__, comm_socket_fd);
 
 	    if (cas->tsc->connected_cb)
 		cas->tsc->connected_cb(cas->tsc, new_client);
