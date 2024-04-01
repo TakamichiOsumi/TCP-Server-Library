@@ -10,6 +10,9 @@ compare_strings(char *result, char *expected){
 	fprintf(stderr, "debug : the result was '%s', but expected was '%s'\n",
 		result, expected);
 	exit(-1);
+    }else{
+	printf("debug : returned the expected result = '%s'\n",
+	       expected);
     }
 }
 

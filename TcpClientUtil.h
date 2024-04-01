@@ -2,7 +2,11 @@
 #define __TCP_CLIENT_UTIL__
 
 #define HDR_LEN 2
-#define MAX_ONE_MESSAGE_SIZE 99 + HDR_LEN
+ /*
+  * The length of longest string to be sent is the sum of
+  * the two-digit header and the longest characters it can represent.
+  */
+#define MAX_ONE_MESSAGE_SIZE HDR_LEN + 99
 
 #include <stdint.h>
 

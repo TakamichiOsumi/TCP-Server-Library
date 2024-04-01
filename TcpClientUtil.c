@@ -54,12 +54,10 @@ UT_get_strlen_as_HDR_string(char *result, char *msg){
 
     memset(result, '\0', HDR_LEN + 1);
 
-    printf("debug : strlen(msg) = '%zu'\n", msg_len);
-
     if (msg_len <= 0 ||
 	msg_len >= 100){
 	fprintf(stderr,
-		"debug : Input message '%s' is out of the range for a message header\n",
+		"debug : Input message '%s' can't generate valid message header\n",
 		msg);
 	return 0;
     }
@@ -84,7 +82,9 @@ UT_send_string(int socket_fd, char *msg, int sleep_sec1, int sleep_sec2){
 
     memset(string_with_length, '\0', MAX_ONE_MESSAGE_SIZE);
 
-    msg_len = UT_get_strlen_as_HDR_string(digits, msg);
+    if ((msg_len = UT_get_strlen_as_HDR_string(digits, msg)) == 0){
+	return;
+    }
 
     /* Send HDR_LEN bytes without the null character */
     if ((sent_bytes = send(socket_fd, digits, HDR_LEN, 0)) < 0){

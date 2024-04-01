@@ -14,6 +14,7 @@ main(int argc, char **argv){
     socket_fd = UT_connect_as_tcp_client("127.0.0.1", 40000);
 
     UT_send_string(socket_fd, "Hello", 2, 2);
+    UT_send_string(socket_fd, "X", 2, 2);
     UT_send_string(socket_fd, "FooBarFooBar", 2, 2);
     UT_send_string(socket_fd, "Server!!", 2, 2);
     UT_send_string(socket_fd, "from client to server", 2, 2);
