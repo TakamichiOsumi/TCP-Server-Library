@@ -5,60 +5,20 @@
 #include <unistd.h>
 #include <sys/socket.h>
 
-static void
-send_string_pair(int socket_fd, char *msg_len, char *msg,
-		 int sleep_sec1, int sleep_sec2){
-    int sent_bytes;
-
-    /* 2 bytes */
-    if ((sent_bytes = send(socket_fd, msg_len, 2, 0)) < 0){
-	perror("send");
-	exit(-1);
-    }
-
-    printf("sent_bytes : %d\n", sent_bytes);
-
-    if (sleep_sec1 > 0){
-	sleep(sleep_sec1); /* for debug */
-    }
-
-    if ((sent_bytes = send(socket_fd, msg, strlen(msg), 0) < 0)){
-	perror("send");
-	exit(-1);
-    }
-
-    printf("sent_bytes : %d\n", sent_bytes);
-
-    if (sleep_sec2 > 0){
-	sleep(sleep_sec2); /* for debug */
-    }
-}
+#include "TcpClientUtil.h"
 
 int
 main(int argc, char **argv){
-    struct sockaddr_in tcp_dest;
     int socket_fd;
 
-    socket_fd = socket(AF_INET, SOCK_STREAM, 0);
+    socket_fd = UT_connect_as_tcp_client("127.0.0.1", 40000);
 
-    memset(&tcp_dest, 0, sizeof(tcp_dest));
-    tcp_dest.sin_family = AF_INET;
-    tcp_dest.sin_port = htons(40000);
-    tcp_dest.sin_addr.s_addr = inet_addr("127.0.0.1");
+    UT_send_string(socket_fd, "Hello", 2, 2);
+    UT_send_string(socket_fd, "FooBarFooBar", 2, 2);
+    UT_send_string(socket_fd, "Server!!", 2, 2);
+    UT_send_string(socket_fd, "from client to server", 2, 2);
 
-    if (connect(socket_fd,
-		(struct sockaddr *) &tcp_dest,
-		sizeof(tcp_dest))  == -1){
-	perror("connect");
-	exit(-1);
-    }
-
-    send_string_pair(socket_fd, "05", "Hello", 3, 3);
-    send_string_pair(socket_fd, "12", "FooBarFooBar", 3, 3);
-    send_string_pair(socket_fd, "08", "Server!!", 3, 3);
-    send_string_pair(socket_fd, "21", "from client to server", 3, 3);
-
-    close(socket_fd);
+    UT_close(socket_fd);
 
     return 0;
 }
