@@ -11,8 +11,8 @@ static bool
 MD_is_ready_for_flush(TcpMessageDemarcation *msg_dmrc, size_t required_string_length){
     bool enough_data = msg_dmrc->cbb->used_buffer_size / required_string_length > 0;
 
-    printf("debug : %d / %zu > 0 ? %s\n", msg_dmrc->cbb->used_buffer_size, required_string_length,
-	   enough_data ? "yes" : "no");
+    printf("debug : %d / %zu > 0 ? %s\n", msg_dmrc->cbb->used_buffer_size,
+	   required_string_length, enough_data ? "yes" : "no");
 
     if (enough_data){
 	return true;
@@ -35,12 +35,13 @@ MD_create_demarcation_instance(TcpMessageDemarcationType dmrc_type, size_t circu
     msg_dmrc->cbb = CBB_init(circular_buf_size);
     msg_dmrc->parsed_header = false;
     msg_dmrc->client_message = (char *) malloc(sizeof(char) * (circular_buf_size + 1));
-    memset(msg_dmrc->client_message, '\0', circular_buf_size + 1);
 
     if (msg_dmrc->client_message == NULL){
 	perror("malloc");
 	exit(-1);
     }
+
+    memset(msg_dmrc->client_message, '\0', circular_buf_size + 1);
 
     return msg_dmrc;
 }
@@ -83,6 +84,21 @@ MD_process_message(TcpMessageDemarcation *msg_dmrc, TcpClient *tcp_client,
     /* Step1 : Parse the header attached to the front of the client message */
     if (msg_dmrc->parsed_header == false){
 	assert(msg_dmrc->parsed_msg_length == 0);
+
+	/* The safeguard for a case the client sends wrong format header */
+	if (recv_bytes != MessageDemarcationHeader){
+	    printf("debug : received bytes '%d' is shorter or longer than required\n",
+		   recv_bytes);
+	    return;
+	}else{
+	    /* The header length seems fine, quick check for the content */
+	    if ((msg_recvd[0] < '0' || msg_recvd[0] > '9') ||
+		(msg_recvd[1] < '0' || msg_recvd[1] > '9')){
+		printf("debug : received header '%c%c' does not follow the header format\n",
+		       msg_recvd[0], msg_recvd[1]);
+		return;
+	    }
+	}
 
 	/* Read the message header that indicates message length */
 	assert(CBB_write(tcp_client->msg_dmrc->cbb,

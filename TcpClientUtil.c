@@ -65,7 +65,7 @@ UT_get_strlen_as_HDR_string(char *result, char *msg){
     if (msg_len > 0 && msg_len < 10){
 	result[0] = '0';
 	result[1] = msg_len + '0'; /* Convert a char to int */
-    }else {
+    }else{
 	result[0] = (msg_len / 10) + '0';
 	result[1] = (msg_len % 10) + '0';
     }
@@ -73,8 +73,22 @@ UT_get_strlen_as_HDR_string(char *result, char *msg){
     return msg_len;
 }
 
+/* for debug */
 void
-UT_send_string(int socket_fd, char *msg, int sleep_sec1, int sleep_sec2){
+UT_send_string(int socket_fd, char *msg, int sleep_sec){
+    size_t msg_len = strlen(msg);
+
+    if (send(socket_fd, msg, msg_len, 0) < 0){
+        perror("send");
+        exit(-1);
+    }
+
+    if (sleep > 0)
+	sleep(sleep_sec);
+}
+
+void
+UT_send_formatted_string(int socket_fd, char *msg, int sleep_sec1, int sleep_sec2){
     char *string_with_length[MAX_ONE_MESSAGE_SIZE];
     char digits[HDR_LEN + 1];
     size_t msg_len;
