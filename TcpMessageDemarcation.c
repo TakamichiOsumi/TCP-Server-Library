@@ -85,31 +85,49 @@ MD_process_message(TcpMessageDemarcation *msg_dmrc, TcpClient *tcp_client,
     if (msg_dmrc->parsed_header == false){
 	assert(msg_dmrc->parsed_msg_length == 0);
 
-	/* The safeguard for a case the client sends wrong format header */
+	/* Check if the client sends any wrongly formatted data */
 	if (recv_bytes != MessageDemarcationHeader){
-	    printf("debug : received bytes '%d' is shorter or longer than required\n",
-		   recv_bytes);
-	    return;
+	    if (recv_bytes <= 1){
+		/* The message should be only one byte */
+		printf("debug : received bytes '%d' is too short as a message\n",
+		       recv_bytes);
+		printf("debug : dump received data '%s'\n", msg_recvd);
+		return;
+	    }else{
+		/* The message is more than three bytes */
+		if ((msg_recvd[0] < '0' || msg_recvd[0] > '9') ||
+		     (msg_recvd[1] < '0' || msg_recvd[1] > '9')){
+		    /* But, the header doesn't make sense */
+		    printf("debug : received header '%c%c' does not follow the header format\n",
+			   msg_recvd[0], msg_recvd[1]);
+		    return;
+		}
+		/* else, the message looks fine at this moment */
+		message_length = (msg_recvd[0] - '0') * 10 + (msg_recvd[1] - '0');
+		assert(CBB_write(tcp_client->msg_dmrc->cbb,
+				 msg_recvd + 2, message_length) > 0);
+	    }
 	}else{
-	    /* The header length seems fine, quick check for the content */
+	    /* The header length is two and fine, quick check for the content */
 	    if ((msg_recvd[0] < '0' || msg_recvd[0] > '9') ||
 		(msg_recvd[1] < '0' || msg_recvd[1] > '9')){
 		printf("debug : received header '%c%c' does not follow the header format\n",
 		       msg_recvd[0], msg_recvd[1]);
 		return;
 	    }
+
+	    /* Read the message header that indicates message length */
+	    assert(CBB_write(tcp_client->msg_dmrc->cbb,
+			     msg_recvd, MessageDemarcationHeader) > 0);
+
+	    /* XXX : replace atoi with strtol */
+	    message_length = atoi(msg_recvd);
+
+	    /* Consume and store the header information */
+	    bytes_read = CBB_read(msg_dmrc->cbb /* source */,
+				  msg_dmrc->client_message /* dest */,
+				  MessageDemarcationHeader, true);
 	}
-
-	/* Read the message header that indicates message length */
-	assert(CBB_write(tcp_client->msg_dmrc->cbb,
-		     msg_recvd, MessageDemarcationHeader) > 0);
-
-	/* XXX : replace atoi with strtol */
-	message_length = atoi(msg_recvd);
-
-	/* Consume and store the header information */
-	bytes_read = CBB_read(msg_dmrc->cbb /* source */, msg_dmrc->client_message /* dest */,
-			      2, true);
 
 	msg_dmrc->parsed_header = true;
 	msg_dmrc->parsed_msg_length = message_length;

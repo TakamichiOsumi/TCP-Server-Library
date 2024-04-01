@@ -11,11 +11,13 @@
 #include <stdint.h>
 
 int UT_connect_as_tcp_client(char *ip_addr, uint16_t port);
-size_t UT_get_strlen_as_HDR_string(char *result, char *msg);
+void UT_close(int socket_fd);
 
+size_t UT_get_strlen_as_HDR_string(char *result, char *msg);
 void UT_send_string(int socket_fd, char *msg, int sleep_sec);
 void UT_send_formatted_string(int socket_fd, char *msg,
 			      int sleep_sec1, int sleep_sec2);
-void UT_close(int socket_fd);
+void UT_send_regular_concatenated_string(int socket_fd,
+					 char *msg, int sleep_sec);
 
 #endif

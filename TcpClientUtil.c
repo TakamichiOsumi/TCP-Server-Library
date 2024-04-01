@@ -87,14 +87,12 @@ UT_send_string(int socket_fd, char *msg, int sleep_sec){
 	sleep(sleep_sec);
 }
 
+/* Send the header and the main message in separated messages */
 void
 UT_send_formatted_string(int socket_fd, char *msg, int sleep_sec1, int sleep_sec2){
-    char *string_with_length[MAX_ONE_MESSAGE_SIZE];
     char digits[HDR_LEN + 1];
     size_t msg_len;
     ssize_t sent_bytes;
-
-    memset(string_with_length, '\0', MAX_ONE_MESSAGE_SIZE);
 
     if ((msg_len = UT_get_strlen_as_HDR_string(digits, msg)) == 0){
 	return;
@@ -117,5 +115,38 @@ UT_send_formatted_string(int socket_fd, char *msg, int sleep_sec1, int sleep_sec
 
     if (sleep_sec2 > 0){
         sleep(sleep_sec2); /* for debug */
+    }
+}
+
+/* Send the header and the main message within one message */
+void
+UT_send_regular_concatenated_string(int socket_fd, char *msg, int sleep_sec){
+    /* Allocate memory for null termination as well for safety */
+    char msg_with_hdr[MAX_ONE_MESSAGE_SIZE + 1];
+    char digits[HDR_LEN + 1];
+    size_t msg_len;
+    ssize_t sent_bytes;
+
+    memset(msg_with_hdr, '\0', MAX_ONE_MESSAGE_SIZE + 1);
+
+    if ((msg_len = UT_get_strlen_as_HDR_string(digits, msg)) == 0){
+	return;
+    }
+
+    snprintf(msg_with_hdr, MAX_ONE_MESSAGE_SIZE,
+	     "%s%s", digits, msg);
+
+    printf("the concatenated string '%s' will be sent with HDR_LEN + msg_len '%lu'\n",
+	   msg_with_hdr, HDR_LEN + msg_len);
+
+    /* Send the header and the main string without the null character */
+    if ((sent_bytes = send(socket_fd, msg_with_hdr,
+			   HDR_LEN + msg_len, 0)) < 0){
+        perror("send");
+        exit(-1);
+    }
+
+    if (sleep_sec > 0){
+        sleep(sleep_sec); /* for debug */
     }
 }
