@@ -41,7 +41,7 @@ UT_close(int socket_fd){
  * snprintf inserts a null character at ('size' - 1) index.
  * Hence, if one wants to store double digit safely, then
  * the length of buffer for the output should be three, as the
- * header length two. The 'len' for memset should be the same
+ * header length is two. The 'len' for memset should be the same
  * in a similar way.
  *
  * The caller should allocate enough memory for the 'result'.
