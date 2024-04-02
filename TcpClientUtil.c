@@ -73,6 +73,26 @@ UT_get_strlen_as_HDR_string(char *result, char *msg){
     return msg_len;
 }
 
+void
+UT_send_plain_string(int socket_fd, char *msg){
+    char response[SERVER_RESPONSE_LEN + 1];
+
+    memset(response, '\0', SERVER_RESPONSE_LEN + 1);
+
+    if (send(socket_fd, msg, strlen(msg), 0) < 0){
+        perror("send");
+        exit(-1);
+    }
+
+    if (read(socket_fd, response, SERVER_RESPONSE_LEN) <= 0){
+	printf("debug : received no server response\n");
+	exit(-1);
+    }else{
+	printf("debug : received '%c' from the server\n", response[0]);
+    }
+}
+
+
 /* for debug */
 void
 UT_send_string(int socket_fd, char *msg){

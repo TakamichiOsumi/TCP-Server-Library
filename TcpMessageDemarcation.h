@@ -36,6 +36,7 @@ typedef struct TcpMessageDemarcation {
      */
     bool parsed_header;
     int parsed_msg_length;
+    int accumulated_msg_count;
 
     /*
      * This buffer stores the minimum and sufficient string data

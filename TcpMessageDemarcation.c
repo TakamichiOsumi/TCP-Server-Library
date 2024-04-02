@@ -36,6 +36,7 @@ MD_create_demarcation_instance(TcpMessageDemarcationType dmrc_type, size_t circu
     msg_dmrc->cbb = CBB_init(circular_buf_size);
     msg_dmrc->parsed_header = false;
     msg_dmrc->parsed_msg_length = 0;
+    msg_dmrc->accumulated_msg_count = 0;
     msg_dmrc->client_message = (char *) malloc(sizeof(char) * (circular_buf_size + 1));
 
     if (msg_dmrc->client_message == NULL){
@@ -107,7 +108,6 @@ MD_process_message(TcpMessageDemarcation *msg_dmrc, TcpClient *tcp_client,
 		/* The message should be only one byte */
 		printf("debug : received bytes '%d' is too short as a message\n",
 		       recv_bytes);
-		printf("debug : dump received data '%s'\n", msg_recvd);
 		/* Report failure */
 		MD_send_response(tcp_client->comm_fd, MSG_NG);
 		return;
@@ -126,6 +126,16 @@ MD_process_message(TcpMessageDemarcation *msg_dmrc, TcpClient *tcp_client,
 		message_length = (msg_recvd[0] - '0') * 10 + (msg_recvd[1] - '0');
 		assert(CBB_write(tcp_client->msg_dmrc->cbb,
 				 msg_recvd + 2, message_length) > 0);
+
+		/*
+		 * XXX:
+		 *
+		 * If the message is like "03a", whose header indicates the message length is three,
+		 * it means that there would be the subsequent message like "bc" or "b" + "c" or anything.
+		 *
+		 * For that case, it's necesary to concatenate all the main message with msg_dmrc->accumulated
+		 * in this path as well.
+		 */
 	    }
 	}else{
 	    /* The header length is two and fine, quick check for the content */
@@ -163,16 +173,46 @@ MD_process_message(TcpMessageDemarcation *msg_dmrc, TcpClient *tcp_client,
 	memset(msg_dmrc->client_message, '\0', msg_dmrc->cbb->max_buffer_size + 1);
     }else{
 	/*
-	 * Step 2: read the main client message, following the previous header sent by client.
+	 * Step 2: The header is already parsed.
+	 *         Read the main client message, following the previous header sent by client.
 	 */
 	assert(msg_dmrc->parsed_msg_length != 0);
-	/*
-	 * Copy characters from recvfrom() internal buffer and increment cbb's internal
-	 * counter 'used_buffer_size' by the characters.
-	 */
-	assert(CBB_write(tcp_client->msg_dmrc->cbb /* dest */, msg_recvd /* source */,
-			 msg_dmrc->parsed_msg_length) > 0);
-	CBB_dump_snapshot(msg_dmrc->cbb);
+
+	/* Got the exact same (or larger) length of message */
+	if (recv_bytes + msg_dmrc->accumulated_msg_count >= msg_dmrc->parsed_msg_length){
+
+	    /* There is no already-arrived message before ? */
+	    if (msg_dmrc->accumulated_msg_count == 0){
+		/*
+		 * Copy characters from recvfrom() internal buffer and increment cbb's
+		 * internal counter 'used_buffer_size' by the characters.
+		 */
+		assert(CBB_write(tcp_client->msg_dmrc->cbb /* dest */,
+				 msg_recvd /* source */,
+				 msg_dmrc->parsed_msg_length) > 0);
+	    }else{
+		/*
+		 * In previous iterations, received some messages and wrote them in
+		 * the CBB buffer. Load a new into the CBB's buffer to make it readable
+		 * from CBB_read().
+		 */
+		assert(CBB_write(tcp_client->msg_dmrc->cbb /* dest */,
+				 msg_recvd /* source */, recv_bytes) > 0);
+	    }
+	}else if (recv_bytes + msg_dmrc->accumulated_msg_count < msg_dmrc->parsed_msg_length){
+	    /*
+	     * Received new arrival of data. But, the message is splitted and not
+	     * yet fully arrived to pass to the application.
+	     *
+	     * Wait for subsequent iterations to get the complete message.
+	     */
+	    msg_dmrc->accumulated_msg_count += recv_bytes;
+	    /* Some parts of the main message */
+	    printf("debug : Got separate message '%s' and raised the accumulated count : '%d'\n",
+		   msg_recvd, msg_dmrc->accumulated_msg_count);
+	    assert(CBB_write(tcp_client->msg_dmrc->cbb /* dest */,
+			     msg_recvd /* source */, recv_bytes) > 0);
+	}
     }
 
     /* Is the recv_bytes bigger than the full message length ? */
@@ -189,6 +229,7 @@ MD_process_message(TcpMessageDemarcation *msg_dmrc, TcpClient *tcp_client,
 
     msg_dmrc->parsed_header = false;
     msg_dmrc->parsed_msg_length = 0;
+    msg_dmrc->accumulated_msg_count = 0;
 
     printf("Read %zu bytes by CBB_read in %s\n", bytes_read, __FUNCTION__);
 
