@@ -35,6 +35,7 @@ MD_create_demarcation_instance(TcpMessageDemarcationType dmrc_type, size_t circu
     msg_dmrc->dmrc_type = dmrc_type;
     msg_dmrc->cbb = CBB_init(circular_buf_size);
     msg_dmrc->parsed_header = false;
+    msg_dmrc->parsed_msg_length = 0;
     msg_dmrc->client_message = (char *) malloc(sizeof(char) * (circular_buf_size + 1));
 
     if (msg_dmrc->client_message == NULL){
@@ -199,7 +200,7 @@ MD_process_message(TcpMessageDemarcation *msg_dmrc, TcpClient *tcp_client,
 					 msg_dmrc->client_message, bytes_read);
 	/*
 	 * Clean up the buffer. Otherwise, some junks are left in this buffer,
-	 * if the next message length is shorter than this iteration.
+	 * if the next message length is shorter than that of this iteration.
 	 */
 	memset(msg_dmrc->client_message, '\0', msg_dmrc->cbb->max_buffer_size + 1);
 

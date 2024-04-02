@@ -90,8 +90,7 @@ UT_send_string(int socket_fd, char *msg){
 	printf("debug : received no server response\n");
 	exit(-1);
     }else{
-	printf("debug : received '%c' from the server\n",
-	       response[0]);
+	printf("debug : received '%c' from the server\n", response[0]);
     }
 }
 
