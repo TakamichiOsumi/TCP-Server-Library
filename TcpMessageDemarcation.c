@@ -206,6 +206,13 @@ MD_process_message(TcpMessageDemarcation *msg_dmrc, TcpClient *tcp_client,
 
 	/* Send back the message of message acceptance */
 	MD_send_response(tcp_client->comm_fd, MSG_OK);
+
+	/*
+	 * When the server handles massive client messages, the internal buffer
+	 * of stdout suspends the output. It's not productive for debugging process.
+	 * Then, flush the buffer of standard output.
+	 */
+	fflush(stdout);
     }
 }
 
