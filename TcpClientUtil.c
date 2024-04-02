@@ -75,24 +75,35 @@ UT_get_strlen_as_HDR_string(char *result, char *msg){
 
 /* for debug */
 void
-UT_send_string(int socket_fd, char *msg, int sleep_sec){
+UT_send_string(int socket_fd, char *msg){
+    char response[SERVER_RESPONSE_LEN + 1];
     size_t msg_len = strlen(msg);
+
+    memset(response, '\0', SERVER_RESPONSE_LEN + 1);
 
     if (send(socket_fd, msg, msg_len, 0) < 0){
         perror("send");
         exit(-1);
     }
 
-    if (sleep > 0)
-	sleep(sleep_sec);
+    if (read(socket_fd, response, SERVER_RESPONSE_LEN) <= 0){
+	printf("debug : received no server response\n");
+	exit(-1);
+    }else{
+	printf("debug : received '%c' from the server\n",
+	       response[0]);
+    }
 }
 
 /* Send the header and the main message in separated messages */
 void
-UT_send_formatted_string(int socket_fd, char *msg, int sleep_sec1, int sleep_sec2){
+UT_send_formatted_string(int socket_fd, char *msg){
+    char response[SERVER_RESPONSE_LEN + 1];
     char digits[HDR_LEN + 1];
     size_t msg_len;
     ssize_t sent_bytes;
+
+    memset(response, '\0', SERVER_RESPONSE_LEN + 1);
 
     if ((msg_len = UT_get_strlen_as_HDR_string(digits, msg)) == 0){
 	return;
@@ -104,8 +115,11 @@ UT_send_formatted_string(int socket_fd, char *msg, int sleep_sec1, int sleep_sec
         exit(-1);
     }
 
-    if (sleep_sec1 > 0){
-        sleep(sleep_sec1); /* for debug */
+    if (read(socket_fd, response, SERVER_RESPONSE_LEN) <= 0){
+	printf("debug : received no server response\n");
+    }else{
+	printf("debug : received '%c' from the server\n",
+	       response[0]);
     }
 
     if ((sent_bytes = send(socket_fd, msg, strlen(msg), 0) < 0)){
@@ -113,21 +127,25 @@ UT_send_formatted_string(int socket_fd, char *msg, int sleep_sec1, int sleep_sec
         exit(-1);
     }
 
-    if (sleep_sec2 > 0){
-        sleep(sleep_sec2); /* for debug */
+    if (read(socket_fd, response, SERVER_RESPONSE_LEN) <= 0){
+	printf("debug : received no server response\n");
+    }else{
+	printf("debug : received '%c' from the server\n",
+	       response[0]);
     }
 }
 
 /* Send the header and the main message within one message */
 void
-UT_send_regular_concatenated_string(int socket_fd, char *msg, int sleep_sec){
-    /* Allocate memory for null termination as well for safety */
+UT_send_regular_concatenated_string(int socket_fd, char *msg){
     char msg_with_hdr[MAX_ONE_MESSAGE_SIZE + 1];
+    char response[SERVER_RESPONSE_LEN + 1];
     char digits[HDR_LEN + 1];
     size_t msg_len;
     ssize_t sent_bytes;
 
     memset(msg_with_hdr, '\0', MAX_ONE_MESSAGE_SIZE + 1);
+    memset(response, '\0', SERVER_RESPONSE_LEN + 1);
 
     if ((msg_len = UT_get_strlen_as_HDR_string(digits, msg)) == 0){
 	return;
@@ -146,7 +164,10 @@ UT_send_regular_concatenated_string(int socket_fd, char *msg, int sleep_sec){
         exit(-1);
     }
 
-    if (sleep_sec > 0){
-        sleep(sleep_sec); /* for debug */
+    if (read(socket_fd, response, SERVER_RESPONSE_LEN) <= 0){
+	printf("debug : received no server response\n");
+    }else{
+	printf("debug : received '%c' from the server\n",
+	       response[0]);
     }
 }

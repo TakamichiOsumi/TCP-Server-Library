@@ -6,6 +6,10 @@ typedef struct TcpMessageDemarcation TcpMessageDemarcation;
 
 #include "CircularByteBuffer/CircularByteBuffer.h"
 
+typedef enum TcpMessageDemarcationResponse {
+    MSG_NG, MSG_OK
+} TcpMessageDemarcationResponse;
+
 typedef enum TcpMessageDemarcationType {
     VARIABLE_SIZE
 } TcpMessageDemarcationType;

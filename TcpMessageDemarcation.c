@@ -1,4 +1,5 @@
 #include <assert.h>
+#include <sys/socket.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -44,6 +45,20 @@ MD_create_demarcation_instance(TcpMessageDemarcationType dmrc_type, size_t circu
     memset(msg_dmrc->client_message, '\0', circular_buf_size + 1);
 
     return msg_dmrc;
+}
+
+static void
+MD_send_response(int socket_fd, TcpMessageDemarcationResponse response){
+    switch(response){
+	case MSG_NG:
+	    send(socket_fd, "F", 1, 0);
+	    break;
+	case MSG_OK:
+	    send(socket_fd, "C", 1, 0);
+	    break;
+	default:
+	    assert(0);
+    }
 }
 
 /*
@@ -92,6 +107,8 @@ MD_process_message(TcpMessageDemarcation *msg_dmrc, TcpClient *tcp_client,
 		printf("debug : received bytes '%d' is too short as a message\n",
 		       recv_bytes);
 		printf("debug : dump received data '%s'\n", msg_recvd);
+		/* Report failure */
+		MD_send_response(tcp_client->comm_fd, MSG_NG);
 		return;
 	    }else{
 		/* The message is more than three bytes */
@@ -100,6 +117,8 @@ MD_process_message(TcpMessageDemarcation *msg_dmrc, TcpClient *tcp_client,
 		    /* But, the header doesn't make sense */
 		    printf("debug : received header '%c%c' does not follow the header format\n",
 			   msg_recvd[0], msg_recvd[1]);
+		    /* Report failure */
+		    MD_send_response(tcp_client->comm_fd, MSG_NG);
 		    return;
 		}
 		/* else, the message looks fine at this moment */
@@ -113,6 +132,8 @@ MD_process_message(TcpMessageDemarcation *msg_dmrc, TcpClient *tcp_client,
 		(msg_recvd[1] < '0' || msg_recvd[1] > '9')){
 		printf("debug : received header '%c%c' does not follow the header format\n",
 		       msg_recvd[0], msg_recvd[1]);
+		/* Report failure */
+		MD_send_response(tcp_client->comm_fd, MSG_NG);
 		return;
 	    }
 
@@ -154,8 +175,10 @@ MD_process_message(TcpMessageDemarcation *msg_dmrc, TcpClient *tcp_client,
     }
 
     /* Is the recv_bytes bigger than the full message length ? */
-    if (!MD_is_ready_for_flush(msg_dmrc, msg_dmrc->parsed_msg_length))
+    if (!MD_is_ready_for_flush(msg_dmrc, msg_dmrc->parsed_msg_length)){
+	MD_send_response(tcp_client->comm_fd, MSG_OK);
 	return;
+    }
 
     /*
      * Step 3 : If the message is long enough, then, copy it as client message.
@@ -179,6 +202,9 @@ MD_process_message(TcpMessageDemarcation *msg_dmrc, TcpClient *tcp_client,
 	 * if the next message length is shorter than this iteration.
 	 */
 	memset(msg_dmrc->client_message, '\0', msg_dmrc->cbb->max_buffer_size + 1);
+
+	/* Send back the message of message acceptance */
+	MD_send_response(tcp_client->comm_fd, MSG_OK);
     }
 }
 

@@ -11,36 +11,29 @@
 static void
 CT_send_pair_messages(int socket_fd){
     /* Send one short string */
-    UT_send_formatted_string(socket_fd, "Hello Server", 2, 2);
+    UT_send_formatted_string(socket_fd, "Hello Server");
     /* Send one character */
-    UT_send_formatted_string(socket_fd, "x", 2, 2);
+    UT_send_formatted_string(socket_fd, "x");
     /* Send more than 10 characters (only digits) */
-    UT_send_formatted_string(socket_fd,
-			     "1234567890"
-			     "12345", 2, 2);
-    UT_send_formatted_string(socket_fd,
-			     "Message from client to server", 2, 2);
+    UT_send_formatted_string(socket_fd, "123456789012345");
+    UT_send_formatted_string(socket_fd, "Message from client to server");
     /* Could the server handle invalid format messages ? */
-    UT_send_string(socket_fd, "0", 2);
-    UT_send_string(socket_fd, "0a", 2);
+    UT_send_string(socket_fd, "0");
+    UT_send_string(socket_fd, "0a");
     /* Send one more valid message again, after the invalid strings */
-    UT_send_formatted_string(socket_fd,
-			     "Message from client to server", 2, 2);
+    UT_send_formatted_string(socket_fd, "Message from client to server");
 }
 
 static void
 CT_send_unified_messages(int socket_fd){
     /* Send one message */
-    UT_send_regular_concatenated_string(socket_fd, "One sequence of message", 1);
+    UT_send_regular_concatenated_string(socket_fd, "One sequence of message");
     /* Send one char */
-    UT_send_regular_concatenated_string(socket_fd, "x", 1);
+    UT_send_regular_concatenated_string(socket_fd, "x");
     /* Send another ones */
-    UT_send_regular_concatenated_string(socket_fd, "another message", 1);
-    UT_send_regular_concatenated_string(socket_fd,
-					"1234567890"
-					"12345", 1);
-    UT_send_regular_concatenated_string(socket_fd,
-					"xyz", 1);
+    UT_send_regular_concatenated_string(socket_fd, "another message");
+    UT_send_regular_concatenated_string(socket_fd, "123456789012345");
+    UT_send_regular_concatenated_string(socket_fd, "xyz");
 }
 
 int
