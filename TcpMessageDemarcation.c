@@ -120,13 +120,12 @@ MD_process_message(TcpMessageDemarcation *msg_dmrc, TcpClient *tcp_client,
 	    assert(CBB_write(tcp_client->msg_dmrc->cbb,
 			     msg_recvd, MessageDemarcationHeader) > 0);
 
-	    /* XXX : replace atoi with strtol */
-	    message_length = atoi(msg_recvd);
-
 	    /* Consume and store the header information */
 	    bytes_read = CBB_read(msg_dmrc->cbb /* source */,
 				  msg_dmrc->client_message /* dest */,
 				  MessageDemarcationHeader, true);
+
+	    message_length = atoi(msg_dmrc->client_message);
 	}
 
 	msg_dmrc->parsed_header = true;
