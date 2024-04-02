@@ -36,6 +36,19 @@ CT_send_unified_messages(int socket_fd){
     UT_send_regular_concatenated_string(socket_fd, "xyz");
 }
 
+/* Stress Test */
+static void
+CT_send_same_message_frequently(int socket_fd){
+#define MSG_LEN 17
+    char msg[MSG_LEN]; /* the message format is "Hello World XXX", where XXX is a number */
+    int i;
+
+    for (i = 0; i < 2000; i++){
+	snprintf(msg, MSG_LEN, "%s %04d", "Hello World", i);
+	UT_send_regular_concatenated_string(socket_fd, msg);
+    }
+}
+
 int
 main(int argc, char **argv){
     int socket_fd;
@@ -44,6 +57,7 @@ main(int argc, char **argv){
 
     CT_send_pair_messages(socket_fd);
     CT_send_unified_messages(socket_fd);
+    CT_send_same_message_frequently(socket_fd);
 
     UT_close(socket_fd);
 
