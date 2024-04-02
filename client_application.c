@@ -32,6 +32,8 @@ static void
 CT_send_unified_messages(int socket_fd){
     /* Send one message */
     UT_send_regular_concatenated_string(socket_fd, "One sequence of message", 1);
+    /* Send one char */
+    UT_send_regular_concatenated_string(socket_fd, "x", 1);
     /* Send another ones */
     UT_send_regular_concatenated_string(socket_fd, "another message", 1);
     UT_send_regular_concatenated_string(socket_fd,
