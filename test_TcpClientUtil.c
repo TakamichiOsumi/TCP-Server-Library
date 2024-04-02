@@ -7,11 +7,11 @@
 static void
 compare_strings(char *result, char *expected){
     if (strncmp(result, expected, strlen(expected)) != 0){
-	fprintf(stderr, "debug : the result was '%s', but expected was '%s'\n",
+	fprintf(stderr, "NG : the result was '%s', but expected is '%s'\n",
 		result, expected);
 	exit(-1);
     }else{
-	printf("debug : returned the expected result = '%s'\n",
+	printf("OK : returned the expected result = '%s'\n",
 	       expected);
     }
 }
