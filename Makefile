@@ -8,6 +8,8 @@ LIB_cbb	= -L $(CURDIR)/$(SUBDIR_cbb)
 LIBS	= $(LIB_ll) $(LIB_cbb)
 MYLIBS	= -llinked_list -lcbb
 BASIC_UTIL_TEST		= exec_util_test
+BASIC_ECHO_CLIENT	= exec_echo_client
+BASIC_ECHO_SERVER	= exec_echo_server
 SERVER_APPLICATION	= run_server_application
 CLIENT_APPLICATION	= run_client_application
 SYSTEM_COMPONENTS = TcpClientDBManager.c  TcpClientServiceManager.c \
@@ -17,7 +19,8 @@ OBJ_SYSTEM_COMPONENTS = TcpClientDBManager.o  TcpClientServiceManager.o \
 			TcpNewConnectionAcceptor.o  TcpServerController.o TcpClient.o \
 			TcpMessageDemarcation.o TcpClientUtil.o
 
-all: libraries $(SERVER_APPLICATION) $(CLIENT_APPLICATION) $(BASIC_UTIL_TEST)
+all: libraries $(SERVER_APPLICATION) $(CLIENT_APPLICATION) $(BASIC_UTIL_TEST) \
+	$(BASIC_ECHO_SERVER) $(BASIC_ECHO_CLIENT)
 
 libraries:
 	for dir in $(SUBDIRS); do make -C $$dir; done
@@ -34,11 +37,18 @@ $(CLIENT_APPLICATION): $(OBJ_SYSTEM_COMPONENTS)
 $(BASIC_UTIL_TEST): $(OBJ_SYSTEM_COMPONENTS)
 	$(CC) $(CFLAGS) test_TcpClientUtil.c TcpClientUtil.o -o $@
 
+$(BASIC_ECHO_SERVER): $(OBJ_SYSTEM_COMPONENTS)
+	$(CC) $(CFLAGS) $(LIBS) $(MYLIBS) echo_server.c $^ -o $@
+
+$(BASIC_ECHO_CLIENT): $(OBJ_SYSTEM_COMPONENTS)
+	$(CC) $(CFLAGS) echo_client.c TcpClientUtil.o -o $@
+
 .phony: clean test
 
 clean:
 	for dir in $(SUBDIRS); do cd $$dir; make clean; cd ..; done
-	rm -rf *.o $(SERVER_APPLICATION) $(CLIENT_APPLICATION) $(BASIC_UTIL_TEST)
+	rm -rf *.o $(SERVER_APPLICATION) $(CLIENT_APPLICATION) \
+		$(BASIC_UTIL_TEST) $(BASIC_ECHO_CLIENT) $(BASIC_ECHO_SERVER)
 
 test: $(BASIC_UTIL_TEST)
 	@./$(BASIC_UTIL_TEST) &> /dev/null && echo "Success if zero >>> $$?"

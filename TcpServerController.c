@@ -49,8 +49,12 @@ void
 TSC_start(TcpServerController* tsc){
     /* Start the CRS thread, the DRS thread and initialize the DBMS */
     CAS_start_acceptor_thread(sys_components.acceptor);
-    // DRS_start_manager_thread(sys_components.service_manager);
-    // DBM_init_client_db_manager(sys_components.db_manager);
+
+    /* DRS_start_manager_thread(sys_components.service_manager); */
+    /* DBM_init_client_db_manager(sys_components.db_manager); */
+
+    /* Keep threads alive after the termination */
+    pthread_exit(0);
 }
 
 void
@@ -75,9 +79,7 @@ TSC_delete_disconnected_client(TcpClient *tcp_client){
 }
 
 void
-TSC_stop(TcpServerController* tsc){
-
-}
+TSC_stop(TcpServerController* tsc){}
 
 void
 TSC_destroy(TcpServerController *tsc){

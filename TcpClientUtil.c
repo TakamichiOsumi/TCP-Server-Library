@@ -85,11 +85,11 @@ UT_send_plain_string(int socket_fd, char *msg){
     }
 
     if (read(socket_fd, response, SERVER_RESPONSE_LEN) <= 0){
-	printf("debug : received no server response\n");
+	/* printf("debug : received no server response\n"); */
 	exit(-1);
-    }else{
-	printf("debug : received '%c' from the server\n", response[0]);
     }
+
+    /* printf("debug : received '%c' from the server\n", response[0]); */
 }
 
 /* for debug */
@@ -108,9 +108,9 @@ UT_send_string(int socket_fd, char *msg){
     if (read(socket_fd, response, SERVER_RESPONSE_LEN) <= 0){
 	printf("debug : received no server response\n");
 	exit(-1);
-    }else{
-	printf("debug : received '%c' from the server\n", response[0]);
     }
+
+    /* printf("debug : received '%c' from the server\n", response[0]); */
 }
 
 /* Send the header and the main message in separated messages */
@@ -135,10 +135,10 @@ UT_send_formatted_string(int socket_fd, char *msg){
 
     if (read(socket_fd, response, SERVER_RESPONSE_LEN) <= 0){
 	printf("debug : received no server response\n");
-    }else{
-	printf("debug : received '%c' from the server\n",
-	       response[0]);
+	exit(-1);
     }
+
+    /* printf("debug : received '%c' from the server\n", response[0]); */
 
     if ((sent_bytes = send(socket_fd, msg, strlen(msg), 0) < 0)){
         perror("send");
@@ -147,10 +147,10 @@ UT_send_formatted_string(int socket_fd, char *msg){
 
     if (read(socket_fd, response, SERVER_RESPONSE_LEN) <= 0){
 	printf("debug : received no server response\n");
-    }else{
-	printf("debug : received '%c' from the server\n",
-	       response[0]);
+	exit(-1);
     }
+
+    /* printf("debug : received '%c' from the server\n", response[0]); */
 }
 
 /* Send the header and the main message within one message */
@@ -172,9 +172,6 @@ UT_send_regular_concatenated_string(int socket_fd, char *msg){
     snprintf(msg_with_hdr, MAX_ONE_MESSAGE_SIZE,
 	     "%s%s", digits, msg);
 
-    printf("the concatenated string '%s' will be sent with HDR_LEN + msg_len '%lu'\n",
-	   msg_with_hdr, HDR_LEN + msg_len);
-
     /* Send the header and the main string without the null character */
     if ((sent_bytes = send(socket_fd, msg_with_hdr,
 			   HDR_LEN + msg_len, 0)) < 0){
@@ -184,8 +181,8 @@ UT_send_regular_concatenated_string(int socket_fd, char *msg){
 
     if (read(socket_fd, response, SERVER_RESPONSE_LEN) <= 0){
 	printf("debug : received no server response\n");
-    }else{
-	printf("debug : received '%c' from the server\n",
-	       response[0]);
+	exit(-1);
     }
+
+    /* printf("debug : received '%c' from the server\n", response[0]); */
 }

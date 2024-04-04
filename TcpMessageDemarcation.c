@@ -232,6 +232,10 @@ MD_process_message(TcpMessageDemarcation *msg_dmrc, TcpClient *tcp_client,
      * Step 4 : Pass the client message to the application logic.
      */
     if (tcp_client->tsc->received_msg_cb != NULL){
+
+	/* Send back the message of message acceptance */
+	MD_send_response(tcp_client->comm_fd, MSG_OK);
+
 	tcp_client->tsc->received_msg_cb(tcp_client->tsc, tcp_client,
 					 msg_dmrc->client_message, bytes_read);
 	/*
@@ -239,9 +243,6 @@ MD_process_message(TcpMessageDemarcation *msg_dmrc, TcpClient *tcp_client,
 	 * if the next message length is shorter than that of this iteration.
 	 */
 	memset(msg_dmrc->client_message, '\0', msg_dmrc->cbb->max_buffer_size + 1);
-
-	/* Send back the message of message acceptance */
-	MD_send_response(tcp_client->comm_fd, MSG_OK);
 
 	/*
 	 * When the server handles massive client messages, the internal buffer

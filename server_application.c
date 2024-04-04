@@ -35,7 +35,5 @@ main(int argc, char **argv){
 			     app_client_received_msg);
     TSC_start(tsc);
 
-    pthread_exit(0);
-
     return 0;
 }
