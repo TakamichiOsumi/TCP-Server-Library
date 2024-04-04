@@ -67,28 +67,23 @@ MD_send_response(int socket_fd, TcpMessageDemarcationResponse response){
  *
  * The overview of MD_process_message is described below.
  *
- * Step1: The first iteration to handle a message header
+ * Step1:
  *
- *       CBB_write : recvfrom buffer --- write ---> cbb's main_data
- *                   2 bytes write for the message hdr
+ *        Parse the header of client's message. Then, store the length of
+ *        main message 'message_length' to 'msg_dmrc->parsed_msg_length'.
  *
- *       CBB_read  : cbb's main_data --- read ---> msg_dmrc->client_message
- *                   2 bytes read for the message hdr
- *                   cbb's main_data is consumed by 'clean_data_source' = true
+ * Step2:
  *
- *        Store the main message length 'message_length' to msg_dmrc->parsed_msg_length
+ *        Receive data from the client and write it to the CBB's buffer,
+ *        'msg_dmrc->cbb'.
  *
- * Step2: The second iteration to handle the main message
+ * Step 3:
  *
- *       CBB_write : cbb's main_data <--- write --- recvfrom buffer
+ *        Write the buffered data to 'msg_dmrc->client_message'.
  *
- * Step 3: Same as Step2
+ * Step 4:
  *
- *       CBB_read  : cbb's main_data --- read ---> msg_dmrc->client_message
- *
- * Step 4: Same as Step2
- *
- *        Pass the main message 'msg_dmrc->client_message' to the application
+ *        Pass the main message 'msg_dmrc->client_message' to the application.
  *
  */
 void
@@ -201,8 +196,8 @@ MD_process_message(TcpMessageDemarcation *msg_dmrc, TcpClient *tcp_client,
 	    }
 	}else if (recv_bytes + msg_dmrc->accumulated_msg_count < msg_dmrc->parsed_msg_length){
 	    /*
-	     * Received new arrival of data. But, the message is splitted and not
-	     * yet fully arrived to pass to the application.
+	     * Received new arrival of data. But, the message is splitted and
+	     * not yet fully arrived to pass to the application.
 	     *
 	     * Wait for subsequent iterations to get the complete message.
 	     */
