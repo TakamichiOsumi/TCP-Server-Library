@@ -143,6 +143,25 @@ CAS_start_acceptor_thread(TcpNewConnectionAcceptor *cas){
 }
 
 void
+CAS_stop(TcpNewConnectionAcceptor *cas){
+    /* Cancel the CAS thread */
+    if (conn_acceptor == NULL)
+	return;
+
+    pthread_cancel(*conn_acceptor);
+    /* Wait until the thread is cancelled successfully */
+    pthread_join(*conn_acceptor, NULL);
+    free(conn_acceptor);
+
+    conn_acceptor = NULL;
+
+    /* Release the fd resource */
+    close(master_socket);
+
+    free(cas);
+}
+
+void
 CAS_destroy(TcpNewConnectionAcceptor *cas){
     if (cas == NULL)
 	return;

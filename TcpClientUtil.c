@@ -92,7 +92,6 @@ UT_send_plain_string(int socket_fd, char *msg){
     }
 }
 
-
 /* for debug */
 void
 UT_send_string(int socket_fd, char *msg){

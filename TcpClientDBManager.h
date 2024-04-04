@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <stdlib.h>
+#include <pthread.h>
 #include "Linked-List/linked_list.h"
 #include "TcpServerController.h"
 #include "TcpClient.h"
@@ -10,6 +11,7 @@
 typedef struct TcpClientDBManager {
     TcpServerController *tsc;
     linked_list *tcp_client_db;
+    pthread_rwlock_t rwlock;
 } TcpClientDBManager;
 
 TcpClientDBManager *DBM_create(TcpServerController *tsc);
