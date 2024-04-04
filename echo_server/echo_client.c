@@ -5,7 +5,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <sys/socket.h>
-#include "TcpClientUtil.h"
+#include "../TcpClientUtil.h"
 
 #define BUFFER_SIZE 32
 

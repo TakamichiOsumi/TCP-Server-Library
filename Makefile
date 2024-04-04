@@ -38,17 +38,17 @@ $(BASIC_UTIL_TEST): $(OBJ_SYSTEM_COMPONENTS)
 	$(CC) $(CFLAGS) test_TcpClientUtil.c TcpClientUtil.o -o $@
 
 $(BASIC_ECHO_SERVER): $(OBJ_SYSTEM_COMPONENTS)
-	$(CC) $(CFLAGS) $(LIBS) $(MYLIBS) echo_server.c $^ -o $@
+	$(CC) $(CFLAGS) $(LIBS) $(MYLIBS) echo_server/echo_server.c $^ -o echo_server/$@
 
 $(BASIC_ECHO_CLIENT): $(OBJ_SYSTEM_COMPONENTS)
-	$(CC) $(CFLAGS) echo_client.c TcpClientUtil.o -o $@
+	$(CC) $(CFLAGS) echo_server/echo_client.c TcpClientUtil.o -o echo_server/$@
 
 .phony: clean test
 
 clean:
 	for dir in $(SUBDIRS); do cd $$dir; make clean; cd ..; done
 	rm -rf *.o $(SERVER_APPLICATION) $(CLIENT_APPLICATION) \
-		$(BASIC_UTIL_TEST) $(BASIC_ECHO_CLIENT) $(BASIC_ECHO_SERVER)
+		$(BASIC_UTIL_TEST) echo_server/$(BASIC_ECHO_CLIENT) echo_server/$(BASIC_ECHO_SERVER)
 
 test: $(BASIC_UTIL_TEST)
 	@./$(BASIC_UTIL_TEST) &> /dev/null && echo "Success if zero >>> $$?"

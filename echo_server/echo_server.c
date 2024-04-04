@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <sys/socket.h>
 #include <pthread.h>
-#include "TcpServerController.h"
-#include "TcpClient.h"
+#include "../TcpServerController.h"
+#include "../TcpClient.h"
 
 static void app_client_received_msg(TcpServerController *tsc,
 				    TcpClient *tcp_client,
