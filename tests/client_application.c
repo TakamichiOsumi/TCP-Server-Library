@@ -5,7 +5,7 @@
 #include <unistd.h>
 #include <sys/socket.h>
 
-#include "TcpClientUtil.h"
+#include "../TcpClientUtil.h"
 
 /* Test to send string data in two separated strings */
 static void

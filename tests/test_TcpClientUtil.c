@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include "TcpClientUtil.h"
+#include "../TcpClientUtil.h"
 
 static void
 compare_strings(char *result, char *expected){
